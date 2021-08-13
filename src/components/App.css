@@ -7,3 +7,18 @@ br {
 div {
 	word-wrap: break-word;
 }
+
+.loading {
+   animation: spinning 2s linear infinite;
+}
+
+
+@keyframes spinning {
+   from {
+      transform: rotateZ(0deg);
+   }
+
+   to {
+      transform: rotateZ(360deg);
+   }
+}

@@ -1,48 +1,54 @@
 import React, { Component } from 'react';
-import dice from '../logos/dice.webp';
-import eth from '../logos/eth.png';
+import dice from '../logos/dice_logo.png';
 import './App.css';
 
 class Main extends Component {
 
+  getAmount(){
+    return this.props.amount ? this.props.amount: ""
+  }
+
   render() {
+    let loadingClass = (this.props.loading)?'loading': ''
+
     return (
       <div className="container-fluid mt-5 col-m-4" style={{ maxWidth: '550px' }}>
         <div className="col-sm">
           <main role="main" className="col-lg-12 text-monospace text-center text-white">
             <div className="content mr-auto ml-auto">
               <div id="content" className="mt-3" >
-                <div className="card mb-4 bg-dark border-danger">
+                <div className="card mb-4 bg-dark">
                   <div className="card-body">
                     <div>
-                      <a
-                        href="http://www.dappuniversity.com/bootcamp"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <img src={dice} width="225" alt="logo" />
-                      </a>
+                        <img className={loadingClass}  src={dice} width="225" alt="logo" style={{transform: "scale(0.75)"}}/>
                     </div>
                     &nbsp;
+                    <p><b>Contract Address: </b> {this.props.contractAddress}</p>
                     <p></p>
                     <div className="input-group mb-4">
+                      { !(this.props.web3 )? <span>Loading...</span>: 
                       <input
                         type="number"
+                        // Set 0.1 ONE as default. If its below the minValue, set min value. If it's above max value, take max value.
+                        value={this.getAmount()}
                         step="0.01"
+                        min="0"
                         className="form-control form-control-md"
                         placeholder="bet amount..."
                         onChange={(e) => this.props.onChange(e.target.value)}
                         required
                       />
+  }
                       <div className="input-group-append">
                         <div className="input-group-text">
-                          <img src={eth} height="20" alt=""/>&nbsp;<b>ETH</b>
+                          <b>ONE</b>
                         </div>
                       </div>
                     </div>
                     <button
                       type="submit"
                       className="btn btn-danger btn-lg"
+                      disabled={this.loading}
                       onClick={(event) => {
                         event.preventDefault()
                         //start with digit, digit+dot* or single dot*, end with digit.
@@ -61,13 +67,14 @@ class Main extends Component {
                     <button
                       type="submit"
                       className="btn btn-success btn-lg"
+                      disabled={this.loading}
                       onClick={(event) => {
                         event.preventDefault()
                         //start with digit, digit+dot* or single dot*, end with digit.
+
                         var reg = new RegExp("^[0-9]*.?[0-9]+$")
                         var minBet = Number(this.props.web3.utils.fromWei((this.props.minBet).toString())).toFixed(5)
-                        
-                        if(reg.test(this.props.amount) && this.props.amount>=minBet){
+                        if(reg.test(this.props.amount) && parseFloat(this.props.amount)>=minBet){
                           const amount = (this.props.amount).toString()
                           this.props.makeBet(1, this.props.web3.utils.toWei(amount))
                         } else {
@@ -79,28 +86,22 @@ class Main extends Component {
                   </div>
                   <div>
                     {!this.props.balance ? <div id="loader" className="spinner-border float-right" role="status"></div> :
-                      <div className="float-right" style={{ width: '220px' }}>
-                        <div className="float-left" style={{ height: '17px' }}>
-                          <b>MaxBet&nbsp;</b>
-                        </div>
-                        <div className="float-right" style={{ height: '17px' }}>
-                          {Number(this.props.web3.utils.fromWei((this.props.maxBet).toString())).toFixed(5)} <b>ETH&nbsp;</b>
-                        </div>                      
-                        <br></br>
-                        <div className="float-left" style={{ height: '17px' }}>
-                          <b>MinBet</b>($1)&nbsp;
-                        </div>
-                        <div className="float-right" style={{ height: '17px' }}>
-                          {Number(this.props.web3.utils.fromWei((this.props.minBet).toString())).toFixed(5)} <b>ETH&nbsp;</b>
-                        </div>
-                        <br></br>
-                        <div className="float-left">
-                          <b>Balance&nbsp;</b>
-                        </div>
-                        <div className="float-right">
-                          {Number(this.props.web3.utils.fromWei((this.props.balance).toString())).toFixed(5)} <b>ETH&nbsp;</b>
-                        </div>
-                      </div>
+                      <table style={{ width: "100%" }}>
+                      <thead>
+                        <tr>
+                          <td>Balance</td>
+                          <td>Min Bet</td>
+                          <td>Max Bet</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                        <td>{Number(this.props.web3.utils.fromWei((this.props.balance).toString())).toFixed(5)}</td>
+                          <td>{Number(this.props.web3.utils.fromWei((this.props.minBet).toString())).toFixed(5)}</td>
+                          <td>{Number(this.props.web3.utils.fromWei((this.props.maxBet).toString())).toFixed(5)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                     }
                   </div>
                 </div>
